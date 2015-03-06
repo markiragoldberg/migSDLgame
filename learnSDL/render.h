@@ -9,7 +9,8 @@
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 640;
 const int TILE_SIZE = 32;
-const int TEXT_SIZE = 16;
+const int TEXT_WIDTH = 10;
+const int TEXT_HEIGHT = 16;
 
 /**
 * Loads a BMP image into a texture on the rendering device
@@ -17,7 +18,7 @@ const int TEXT_SIZE = 16;
 * @param ren The renderer to load the texture onto
 * @return the loaded texture, or nullptr if something went wrong.
 */
-SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren);
+SDL_Texture* loadTexture(const std::string &file);
 
 /**
 * Draw an SDL_Texture to an SDL_Renderer at some destination rect
@@ -28,7 +29,7 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren);
 * @param clip The sub-section of the texture to draw (clipping rect)
 *		default of nullptr draws the entire texture
 */
-void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst, SDL_Rect *clip = nullptr);
+void renderTexture(SDL_Texture *tex, SDL_Rect dst, SDL_Rect *clip = nullptr);
 /**
 * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
 * the texture's width and height and taking a clip of the texture if desired
@@ -41,19 +42,19 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst, SDL_Rect *
 * @param clip The sub-section of the texture to draw (clipping rect)
 *		default of nullptr draws the entire texture
 */
-void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, SDL_Rect *clip = nullptr);
+void renderTexture(SDL_Texture *tex, int x, int y, SDL_Rect *clip = nullptr);
 
-void renderTextCharacter(char character, SDL_Renderer *ren, int x, int y);
+void renderTextCharacter(char character, int x, int y);
 
 //Loads the text file used for rendering strings
 //Currently basically only works with very specific type of libtcod character graphics file
-void loadText(std::string filename, SDL_Renderer *renderer);
+void loadText(std::string filename);
 
 //Loads the images currently hardcoded into use
 //Should eventually load images requested by entries in data files (sword object asks for "sword.png", etc.)
-void loadImages(SDL_Renderer *renderer);
+void loadImages();
 
-void printRect(std::string, SDL_Renderer * ren, int x, int y, int w, int h);
+void printRect(std::string, int x, int y, int w, int h);
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -64,6 +65,12 @@ void logSDLError(std::ostream &os, const std::string &msg);
 
 void deleteRenderingStuff();
 
-void renderDemoSplashScreen(SDL_Renderer *ren);
+int renderingSetup();
+
+void rflush();
+
+void renderDemoSplashScreen();
+
+void clearDemoMapArea();
 
 

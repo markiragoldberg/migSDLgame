@@ -15,15 +15,42 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\main.cpp">
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\render.cpp">
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encounters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encounterClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\randomization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\render.h">
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encounterClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encounters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\demo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\randomization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\npc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

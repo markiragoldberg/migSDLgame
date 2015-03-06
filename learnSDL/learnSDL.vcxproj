@@ -44,7 +44,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2-2.0.3\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2-2.0.3\include\;$(SolutionDir)rapidjson-master\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -60,7 +60,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)SDL2-2.0.3\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SDL2-2.0.3\include\;$(SolutionDir)rapidjson-master\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -72,11 +72,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\main.cpp" />
-    <ClCompile Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\render.cpp" />
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\demo.h" />
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\npc.h" />
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\randomization.h" />
+    <ClInclude Include="encounterClass.h" />
+    <ClInclude Include="..\..\..\git%40siu\learningSDL\learnSDL\render.h" />
+    <ClInclude Include="encounters.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\git%40siu\dungeoncyoa\learningSDL\learnSDL\render.h" />
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\demo.cpp" />
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\randomization.cpp" />
+    <ClCompile Include="encounterClass.cpp" />
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\main.cpp" />
+    <ClCompile Include="..\..\..\git%40siu\learningSDL\learnSDL\render.cpp" />
+    <ClCompile Include="encounters.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

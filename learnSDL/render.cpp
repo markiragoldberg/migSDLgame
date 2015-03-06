@@ -1,23 +1,25 @@
 #include "render.h"
 
 SDL_Texture * text = NULL;
+SDL_Renderer *renderer;
+SDL_Window *window;
 std::unordered_map<std::string, SDL_Texture *> images;
 
-SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren)
+SDL_Texture* loadTexture(const std::string &file)
 {
-	SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
+	SDL_Texture *texture = IMG_LoadTexture(renderer, file.c_str());
 	if (texture == nullptr){
 		logSDLError(std::cout, "LoadTexture");
 	}
 	return texture;
 }
 
-void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst, SDL_Rect *clip)
+void renderTexture(SDL_Texture *tex, SDL_Rect dst, SDL_Rect *clip)
 {
-	SDL_RenderCopy(ren, tex, clip, &dst);
+	SDL_RenderCopy(renderer, tex, clip, &dst);
 }
 
-void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, SDL_Rect *clip)
+void renderTexture(SDL_Texture *tex, int x, int y, SDL_Rect *clip)
 {
 	SDL_Rect dst;
 	dst.x = x;
@@ -29,40 +31,32 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, SDL_Rect *
 	else {
 		SDL_QueryTexture(tex, NULL, NULL, &dst.w, &dst.h);
 	}
-	renderTexture(tex, ren, dst, clip);
+	renderTexture(tex, dst, clip);
 }
 
-
-void renderTextCharacter(char character, SDL_Renderer *ren, int x, int y)
+//this function is bad and only works with one specific image layout
+//caveat coder
+void renderTextCharacter(char character, int x, int y)
 {
 	if (text == NULL)
 		return;
 
 	SDL_Rect dst;
-	dst.w = dst.h = TEXT_SIZE;
+	dst.w = TEXT_WIDTH;
+	dst.h = TEXT_HEIGHT;
 
 	//determine clip
-	if (character >= 'A' && character <= 'Z')
+	if (character >= ' ' && character <= '~')
 	{
-		dst.x = TEXT_SIZE * (character-'A');
-		dst.y = TEXT_SIZE * 3;
-	}
-	else if (character >= 'a' && character <= 'z')
-	{
-		dst.x = TEXT_SIZE * (character-'a');
-		dst.y = TEXT_SIZE * 4;
-	}
-	else if (character >= ' ' && character <= '@')
-	{
-		dst.x = TEXT_SIZE * ((character - ' ') % 32);
-		dst.y = TEXT_SIZE * ((character - ' ') / 32);
+		dst.x = TEXT_WIDTH * ((character - ' ') % 16);
+		dst.y = TEXT_HEIGHT *(2 + ((character - ' ') / 16));
 	}
 	else
 	{
 		//'?'
-		dst.x = TEXT_SIZE*31; dst.y = 0;
+		dst.x = TEXT_WIDTH*15; dst.y = TEXT_HEIGHT*3;
 	}
-	renderTexture(text, ren, x, y, &dst);
+	renderTexture(text, x, y, &dst);
 }
 
 void logSDLError(std::ostream &os, const std::string &msg)
@@ -70,73 +64,73 @@ void logSDLError(std::ostream &os, const std::string &msg)
 	os << msg << " error: " << SDL_GetError() << std::endl;
 }
 
-void loadText(std::string filename, SDL_Renderer *renderer)
+void loadText(std::string filename)
 {
-	text = loadTexture(filename,renderer);
+	text = loadTexture(filename);
 }
 
 void loadImages(SDL_Renderer *renderer)
 {
-	images["background"] = loadTexture("png/floor.png", renderer);
-	images["border"] = loadTexture("png/stone_brick1.png", renderer);
-	images["orc"] = loadTexture("png/orc.png", renderer);
-	images["ogre"] = loadTexture("png/two_headed_ogre.png", renderer);
-	images["worm"] = loadTexture("png/spiny_worm.png", renderer);
-	images["hound"] = loadTexture("png/hound.png", renderer);
-	images["orcWarrior"] = loadTexture("png/orc_warrior.png", renderer);
-	images["orcWizard"] = loadTexture("png/orc_wizard.png", renderer);
-	images["orcWarlord"] = loadTexture("png/orc_warlord.png", renderer);
-	images["mace"] = loadTexture("png/mace.png", renderer);
-	images["greataxe"] = loadTexture("png/greataxe.png", renderer);
-	images["glaive"] = loadTexture("png/glaive3.png", renderer);
-	images["handaxe"] = loadTexture("png/hand_axe.png", renderer);
-	images["club"] = loadTexture("png/club_slant.png", renderer);
-	images["sword"] = loadTexture("png/long_sword_slant.png", renderer);
-	images["shield"] = loadTexture("png/shield_kite3.png", renderer);
-	images["shieldorc"] = loadTexture("png/shield_kite4.png", renderer);
+	images["background"] = loadTexture("png/floor.png");
+	images["border"] = loadTexture("png/stone_brick1.png");
+	images["orc"] = loadTexture("png/orc.png");
+	images["ogre"] = loadTexture("png/two_headed_ogre.png");
+	images["worm"] = loadTexture("png/spiny_worm.png");
+	images["hound"] = loadTexture("png/hound.png");
+	images["orcWarrior"] = loadTexture("png/orc_warrior.png");
+	images["orcWizard"] = loadTexture("png/orc_wizard.png");
+	images["orcWarlord"] = loadTexture("png/orc_warlord.png");
+	images["mace"] = loadTexture("png/mace.png");
+	images["greataxe"] = loadTexture("png/greataxe.png");
+	images["glaive"] = loadTexture("png/glaive3.png");
+	images["handaxe"] = loadTexture("png/hand_axe.png");
+	images["club"] = loadTexture("png/club_slant.png");
+	images["sword"] = loadTexture("png/long_sword_slant.png");
+	images["shield"] = loadTexture("png/shield_kite3.png");
+	images["shieldorc"] = loadTexture("png/shield_kite4.png");
 
-	images["fighter"] = loadTexture("png/fighter.png", renderer);
-	images["barbarian"] = loadTexture("png/barbarian.png", renderer);
-	images["archer"] = loadTexture("png/archer.png", renderer);
-	images["rogue"] = loadTexture("png/rogue.png", renderer);
-	images["cleric"] = loadTexture("png/cleric.png", renderer);
-	images["wizard"] = loadTexture("png/wizard.png", renderer);
-	images["textBackground"] = loadTexture("png/volcanic_floor0.png", renderer);
-	images["UIBorder"] = loadTexture("png/stone_dark0.png", renderer);
+	images["fighter"] = loadTexture("png/fighter.png");
+	images["barbarian"] = loadTexture("png/barbarian.png");
+	images["archer"] = loadTexture("png/archer.png");
+	images["rogue"] = loadTexture("png/rogue.png");
+	images["cleric"] = loadTexture("png/cleric.png");
+	images["wizard"] = loadTexture("png/wizard.png");
+	images["textBackground"] = loadTexture("png/volcanic_floor0.png");
+	images["UIBorder"] = loadTexture("png/stone_dark0.png");
 
-	images["greatsword"] = loadTexture("png/great_sword_slant.png", renderer);
-	images["staff"] = loadTexture("png/staff_mage.png", renderer);
-	images["dagger"] = loadTexture("png/dagger.png", renderer);
+	images["greatsword"] = loadTexture("png/great_sword_slant.png");
+	images["staff"] = loadTexture("png/staff_mage.png");
+	images["dagger"] = loadTexture("png/dagger.png");
 
-	images["sword_inv"] = loadTexture("png/long_sword1.png", renderer);
-	images["shield_inv"] = loadTexture("png/shield1_elven.png", renderer);
-	images["greatsword_inv"] = loadTexture("png/greatsword2.png", renderer);
-	images["bow_inv"] = loadTexture("png/longbow.png", renderer);
-	images["dagger_inv"] = loadTexture("png/dagger_inv.png", renderer);
-	images["cloak_inv"] = loadTexture("png/cloak2.png", renderer);
-	images["staff_inv"] = loadTexture("png/staff05.png", renderer);
-	images["book_inv"] = loadTexture("png/metal_blue.png", renderer);
-	images["mace_inv"] = loadTexture("png/mace2.png", renderer);
+	images["sword_inv"] = loadTexture("png/long_sword1.png");
+	images["shield_inv"] = loadTexture("png/shield1_elven.png");
+	images["greatsword_inv"] = loadTexture("png/greatsword2.png");
+	images["bow_inv"] = loadTexture("png/longbow.png");
+	images["dagger_inv"] = loadTexture("png/dagger_inv.png");
+	images["cloak_inv"] = loadTexture("png/cloak2.png");
+	images["staff_inv"] = loadTexture("png/staff05.png");
+	images["book_inv"] = loadTexture("png/metal_blue.png");
+	images["mace_inv"] = loadTexture("png/mace2.png");
 }
 
 
 
-void printRect(std::string text, SDL_Renderer * ren, int startX, int startY, int w, int h)
+void printRect(std::string text, int startX, int startY, int w, int h)
 {
 	//keep track of current width, height offset, char in string
 	int maxX = startX + w; int maxY = startY + h;
 	int x = startX; int y = startY;
 	unsigned i = 0;
-	while (i < text.size() && y + TEXT_SIZE <= maxY)
+	while (i < text.size() && y + TEXT_HEIGHT <= maxY)
 	{
 		//write char
-		renderTextCharacter(text[i], ren, x, y);
+		renderTextCharacter(text[i], x, y);
 		i++;
-		x += TEXT_SIZE;
-		if (x + TEXT_SIZE > maxX)
+		x += TEXT_WIDTH;
+		if (x + TEXT_WIDTH > maxX)
 		{
 			x = startX;
-			y += TEXT_SIZE;
+			y += TEXT_HEIGHT;
 		}
 	}
 	//while more chars in string and current height plus size of a char less than maximum height
@@ -158,16 +152,54 @@ void deleteRenderingStuff()
 	{
 		SDL_DestroyTexture(i->second);
 	}
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 }
 
-void renderDemoSplashScreen(SDL_Renderer *renderer)
+int renderingSetup()
+{
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
+		logSDLError(std::cout, "SDL_Init");
+		return 1;
+	}
+
+	window = SDL_CreateWindow("SDL2", 100, 30, SCREEN_WIDTH,
+		SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (window == nullptr){
+		logSDLError(std::cout, "CreateWindow");
+		SDL_Quit();
+		return 1;
+	}
+	renderer = SDL_CreateRenderer(window, -1,
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == nullptr){
+		logSDLError(std::cout, "CreateRenderer");
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		return 1;
+	}
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+
+	loadText("png/terminal10x16_gs_ro_ts.png");
+	loadImages(renderer);
+	return 1;
+}
+
+void rflush()
+{
+	SDL_RenderPresent(renderer);
+}
+
+void renderDemoSplashScreen()
 {
 	//Background
 	for (int x = TILE_SIZE; x < SCREEN_WIDTH - TILE_SIZE; x += TILE_SIZE)
 	{
 		for (int y = TILE_SIZE; y < SCREEN_HEIGHT - TILE_SIZE * 8; y += TILE_SIZE)
 		{
-			renderTexture(images["background"], renderer, x, y);
+			renderTexture(images["background"], x, y);
 		}
 	}
 	//Text area background
@@ -175,7 +207,7 @@ void renderDemoSplashScreen(SDL_Renderer *renderer)
 	{
 		for (int y = SCREEN_HEIGHT - TILE_SIZE * 7; y < SCREEN_HEIGHT - TILE_SIZE; y += TILE_SIZE)
 		{
-			renderTexture(images["textBackground"], renderer, x, y);
+			renderTexture(images["textBackground"], x, y);
 		}
 	}
 	//Bricks along window interior border, border between map and UI elements
@@ -183,131 +215,144 @@ void renderDemoSplashScreen(SDL_Renderer *renderer)
 	//but it looks nice enough for a demo
 	for (int x = TILE_SIZE; x < SCREEN_WIDTH - TILE_SIZE; x += TILE_SIZE)
 	{
-		renderTexture(images["border"], renderer, x, 0);
-		renderTexture(images["border"], renderer, x, SCREEN_HEIGHT - TILE_SIZE);
+		renderTexture(images["border"], x, 0);
+		renderTexture(images["border"], x, SCREEN_HEIGHT - TILE_SIZE);
 		//interior map area/text area border
-		renderTexture(images["UIBorder"], renderer, x, SCREEN_HEIGHT - TILE_SIZE * 8);
+		renderTexture(images["UIBorder"], x, SCREEN_HEIGHT - TILE_SIZE * 8);
 	}
 	for (int y = 0; y < SCREEN_HEIGHT; y += TILE_SIZE)
 	{
-		renderTexture(images["border"], renderer, 0, y);
-		renderTexture(images["border"], renderer, SCREEN_WIDTH - TILE_SIZE, y);
+		renderTexture(images["border"], 0, y);
+		renderTexture(images["border"], SCREEN_WIDTH - TILE_SIZE, y);
 	}
 
 	//The party
 
-	renderTexture(images["fighter"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
-	renderTexture(images["sword"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
-	renderTexture(images["shield"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
-	renderTexture(images["archer"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 5, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
-	renderTexture(images["barbarian"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE);
-	renderTexture(images["greatsword"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE);
-	renderTexture(images["wizard"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2);
-	renderTexture(images["staff"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2);
-	renderTexture(images["cleric"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 + TILE_SIZE);
-	renderTexture(images["mace"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 + TILE_SIZE);
-	renderTexture(images["rogue"], renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	renderTexture(images["dagger"], renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	renderTexture(images["fighter"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
+	renderTexture(images["sword"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
+	renderTexture(images["shield"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE);
+	renderTexture(images["archer"], SCREEN_WIDTH / 2 - TILE_SIZE * 5, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
+	renderTexture(images["barbarian"], SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE);
+	renderTexture(images["greatsword"], SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE);
+	renderTexture(images["wizard"], SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2);
+	renderTexture(images["staff"], SCREEN_WIDTH / 2 - TILE_SIZE * 2, SCREEN_HEIGHT / 2);
+	renderTexture(images["cleric"], SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 + TILE_SIZE);
+	renderTexture(images["mace"], SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 + TILE_SIZE);
+	renderTexture(images["rogue"], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	renderTexture(images["dagger"], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
 	//The orcs and their allies
 
-	renderTexture(images["orcWarlord"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
-	renderTexture(images["glaive"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
+	renderTexture(images["orcWarlord"], SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
+	renderTexture(images["glaive"], SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 2);
 
-	renderTexture(images["orcWarrior"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
-	renderTexture(images["sword"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
-	renderTexture(images["shieldorc"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
-	renderTexture(images["orcWarrior"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
-	renderTexture(images["greataxe"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE,SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["orcWarrior"], SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["sword"], SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["shieldorc"], SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["orcWarrior"], SCREEN_WIDTH / 2 + TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["greataxe"], SCREEN_WIDTH / 2 + TILE_SIZE,SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
 
-	renderTexture(images["orcWizard"], renderer, SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 5);
+	renderTexture(images["orcWizard"], SCREEN_WIDTH / 2 + TILE_SIZE * 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 5);
 
-	renderTexture(images["orc"], renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
-	renderTexture(images["mace"], renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["orc"], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["mace"], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
 
-	renderTexture(images["ogre"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
+	renderTexture(images["ogre"], SCREEN_WIDTH / 2 - TILE_SIZE * 3, SCREEN_HEIGHT / 2 - TILE_SIZE * 3);
 
-	renderTexture(images["worm"], renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 5);
+	renderTexture(images["worm"], SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - TILE_SIZE * 5);
 
-	renderTexture(images["orc"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 4);
-	renderTexture(images["handaxe"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 4);
+	renderTexture(images["orc"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 4);
+	renderTexture(images["handaxe"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 4);
 
-	renderTexture(images["orc"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 6);
-	renderTexture(images["club"], renderer, SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 6);
+	renderTexture(images["orc"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 6);
+	renderTexture(images["club"], SCREEN_WIDTH / 2 - TILE_SIZE, SCREEN_HEIGHT / 2 - TILE_SIZE * 6);
 
 	//Giant hideous poorly-scaled portrait of orc warlord on the left
 	SDL_Rect portrait;
 	portrait.x = TILE_SIZE; portrait.y = TILE_SIZE;
 	portrait.w = TILE_SIZE * 8; portrait.h = TILE_SIZE * 11;
-	renderTexture(images["orcWarlord"], renderer, portrait);
-	renderTexture(images["glaive"], renderer, portrait);
+	renderTexture(images["orcWarlord"], portrait);
+	renderTexture(images["glaive"], portrait);
 
-	printRect("Fred,", renderer, TEXT_SIZE * 8, TEXT_SIZE * 14, TEXT_SIZE * 15, TEXT_SIZE);
-	printRect("the Orc Warlord", renderer, TEXT_SIZE * 3, TEXT_SIZE * 15, TEXT_SIZE * 15, TEXT_SIZE);
+	printRect("Fred,", TILE_SIZE * 4, TILE_SIZE * 7, (TILE_SIZE * 15)/2, TEXT_HEIGHT);
+	printRect("the Orc Warlord", (TILE_SIZE * 3)/2, (TILE_SIZE * 15)/2, (TILE_SIZE * 15)/2, TEXT_HEIGHT);
 
 	//Encounter options on the right
-	printRect("Your party runs into a few orcs. What do you do?", renderer, TILE_SIZE * 18, TILE_SIZE * 2, SCREEN_WIDTH - TILE_SIZE * 19,TEXT_SIZE*4);
+	printRect("Your party runs into a few orcs. What do you do?", TILE_SIZE * 18, TILE_SIZE * 2, SCREEN_WIDTH - TILE_SIZE * 19,TILE_SIZE*2);
 
-	printRect("1 - Try to negotiate.", renderer, TILE_SIZE * 18, TILE_SIZE * 4, SCREEN_WIDTH - TILE_SIZE * 19, TEXT_SIZE * 4);
-	printRect("2 - Fight the orcs!", renderer, TILE_SIZE * 18, TILE_SIZE * 5, SCREEN_WIDTH - TILE_SIZE * 19, TEXT_SIZE * 4);
-	printRect("3 - Run away!", renderer, TILE_SIZE * 18, TILE_SIZE * 6, SCREEN_WIDTH - TILE_SIZE * 19, TEXT_SIZE * 4);
-	printRect("4 - Surrender.", renderer, TILE_SIZE * 18, TILE_SIZE * 7, SCREEN_WIDTH - TILE_SIZE * 19, TEXT_SIZE * 4);
+	printRect("1 - Try to negotiate.", TILE_SIZE * 18, TILE_SIZE * 4, SCREEN_WIDTH - TILE_SIZE * 19, TILE_SIZE * 2);
+	printRect("2 - Fight the orcs!", TILE_SIZE * 18, TILE_SIZE * 5, SCREEN_WIDTH - TILE_SIZE * 19, TILE_SIZE * 2);
+	printRect("3 - Run away!", TILE_SIZE * 18, TILE_SIZE * 6, SCREEN_WIDTH - TILE_SIZE * 19, TILE_SIZE * 2);
+	printRect("4 - Surrender.", TILE_SIZE * 18, TILE_SIZE * 7, SCREEN_WIDTH - TILE_SIZE * 19, TILE_SIZE * 2);
 
 	//Party info area
 
 	//TERENCE, THE FIGHTER
-	printRect(" Terence, the Fighter", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 7, SCREEN_WIDTH - TILE_SIZE*6, TEXT_SIZE);
-	printRect(" HP:  20/20  MP   2/3   Confident", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 7 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["fighter"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
-	renderTexture(images["sword"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
-	renderTexture(images["shield"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
-	renderTexture(images["sword_inv"], renderer, SCREEN_WIDTH-TILE_SIZE*4, SCREEN_HEIGHT - TILE_SIZE * 7);
-	renderTexture(images["shield_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 7);
+	printRect(" Terence, the Fighter",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 14, SCREEN_WIDTH - TILE_SIZE*6, TEXT_HEIGHT);
+	printRect(" HP:  20/20  MP   2/3   Confident",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 13, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["fighter"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
+	renderTexture(images["sword"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
+	renderTexture(images["shield"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 7);
+	renderTexture(images["sword_inv"], SCREEN_WIDTH-TILE_SIZE*4, SCREEN_HEIGHT - TILE_SIZE * 7);
+	renderTexture(images["shield_inv"], SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 7);
 	//NORRIS, THE BARBARIAN
-	printRect(" Norris, the Barbarian", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 6, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	printRect(" HP:  34/34  MP   0/0   Unshakeable", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 6 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["barbarian"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 6);
-	renderTexture(images["greatsword"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 6);
-	renderTexture(images["greatsword_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 6);
+	printRect(" Norris, the Barbarian",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 6, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	printRect(" HP:  34/34  MP   0/0   Unshakeable",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 11, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["barbarian"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 6);
+	renderTexture(images["greatsword"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 6);
+	renderTexture(images["greatsword_inv"], SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 6);
 	//NESSUS, THE ARCHER
-	printRect(" Nessus, the Archer", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 5, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	printRect(" HP:  18/18  MP   1/1   Steady", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 5 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["archer"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 5);
-	renderTexture(images["bow_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 5);
+	printRect(" Nessus, the Archer",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 5, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	printRect(" HP:  18/18  MP   1/1   Steady",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 9, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["archer"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 5);
+	renderTexture(images["bow_inv"], SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 5);
 	//MAURICE, THE ROGUE
-	printRect(" Maurice, the Rogue", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 4, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	printRect(" HP:  14/14  MP   6/11  Self-certain", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 4 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["rogue"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 4);
-	renderTexture(images["dagger"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 4);
-	renderTexture(images["dagger_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 4);
-	renderTexture(images["cloak_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 4);
+	printRect(" Maurice, the Rogue",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 4, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	printRect(" HP:  14/14  MP   6/11  Self-certain",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 7, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["rogue"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 4);
+	renderTexture(images["dagger"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 4);
+	renderTexture(images["dagger_inv"], SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 4);
+	renderTexture(images["cloak_inv"], SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 4);
 	//MENNAS, THE CLERIC
-	printRect(" Mennas, the Cleric", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 3, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	printRect(" HP:  17/17  MP  14/18  Zealous", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 3 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["cleric"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 3);
-	renderTexture(images["mace"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 3);
-	renderTexture(images["mace_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 3);
-	renderTexture(images["book_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 3);
+	printRect(" Mennas, the Cleric",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 3, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	printRect(" HP:  17/17  MP  14/18  Zealous",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT * 5, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["cleric"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 3);
+	renderTexture(images["mace"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 3);
+	renderTexture(images["mace_inv"], SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 3);
+	renderTexture(images["book_inv"], SCREEN_WIDTH - TILE_SIZE * 3, SCREEN_HEIGHT - TILE_SIZE * 3);
 	//BORIS, THE WIZARD
-	printRect(" Boris, the Wizard", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 2, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	printRect(" HP:   9/9   MP  24/29  Focused", renderer,
-		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 2 + TEXT_SIZE, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_SIZE);
-	renderTexture(images["wizard"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 2);
-	renderTexture(images["staff"], renderer, TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 2);
-	renderTexture(images["staff_inv"], renderer, SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 2);
+	printRect(" Boris, the Wizard",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TILE_SIZE * 2, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	printRect(" HP:   9/9   MP  24/29  Focused",
+		TILE_SIZE * 2, SCREEN_HEIGHT - TEXT_HEIGHT*3, SCREEN_WIDTH - TILE_SIZE * 6, TEXT_HEIGHT);
+	renderTexture(images["wizard"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 2);
+	renderTexture(images["staff"], TILE_SIZE, SCREEN_HEIGHT - TILE_SIZE * 2);
+	renderTexture(images["staff_inv"], SCREEN_WIDTH - TILE_SIZE * 4, SCREEN_HEIGHT - TILE_SIZE * 2);
 
 	
 
 	SDL_RenderPresent(renderer);
+}
+
+void clearDemoMapArea()
+{
+	//Background
+	for (int x = TILE_SIZE; x < SCREEN_WIDTH - TILE_SIZE; x += TILE_SIZE)
+	{
+		for (int y = TILE_SIZE; y < SCREEN_HEIGHT - TILE_SIZE * 8; y += TILE_SIZE)
+		{
+			renderTexture(images["background"], x, y);
+		}
+	}
+	rflush();
 }

@@ -1,0 +1,160 @@
+[{
+	"encounter": "orcDemo",
+	"npcs": ["orc warrior",6,"orc knight",2],
+	"dialogue":
+	[{
+		"text": "As you walk through a worn tunnel, you are spotted by an orcish patrol, and they form a line to block the passage ahead. \"You can't go through here,\" their leader says. \"We'll kill you if you try. Go away.\"",
+		"options":
+			["fight","bribe","leave"]
+	},{
+		"node": "fight",
+		"trans": "Fight the orcs.",
+		"text": "The orcs draw their weapons and advance on you, cursing.",
+		"ending": "startCombat"
+	},{
+		"node": "leave",
+		"trans": "Go somewhere else.",
+		"text": "The orcs watch you carefully as you leave, but do not pursue. You will have to find another way forward.",
+		"ending": "pcsRetreated"
+	},{
+		"node":"bribe",
+		"trans":"Have the bard negotiate a bribe.",
+		"text":"Your bard starts haggling with the orcs, but they are stubborn and won't abandon their posts easily. \"You are willing to pay to pass? We want pies. One dozen pies.\"",
+		"options":
+			["pies","fight","leave"]
+	},{
+		"node":"pies",
+		"trans":"Give the orcs the pies.",
+		"text":"You give the orc leader the pies, and they move to one side of the passage, watching carefully as you pass close by. You don't see them break formation, even as you pass a bend in the passage beyond.",
+		"ending": "end"
+	},{
+		"node": "wonCombat",
+		"text": "Orcs are tough and well armored, but your party must be tougher because they automatically won. The path ahead is now clear.",
+		"ending": "end"
+	}]
+},{
+	"encounter": "trapDemo",
+	"dialogue":
+	[{
+		"text": "While navigating past piles of junk in a forgotten storage room, your fighter dislodges half of a broken table and reveals a dirty, but intact, chest.",
+		"options":
+			["openUnsafe","checkTraps", "leaveUnsafe"]
+	},{
+		"node": "openUnsafe",
+		"trans": "Open the chest.",
+		"text": "The fighter opens the chest, and a spike shoots out and bounces off his armor. The chest is empty.",
+		"ending": "end"
+	},{
+		"node": "checkTraps",
+		"trans": "Have the thief check for traps.",
+		"text": "The thief inspects the chest and carefully disarms a tripwire attached to the lid.",
+		"options":
+			["openSafe", "leaveSafe"]
+	},{
+		"node": "openSafe",
+		"trans": "Open the chest.",
+		"text": "The thief opens the chest. There is an inert spike on a spring, but the chest is otherwise empty.",
+		"ending": "end"
+	},{
+		"node": "leaveUnsafe",
+		"trans": "Leave the chest alone.",
+		"text": "The chest might be trapped. You leave it alone.",
+		"ending": "pcsRetreated"
+	},{
+		"node": "leaveSafe",
+		"trans": "Stop touching the chest.",
+		"text": "There might be more traps that your thief didn't find. You leave the chest alone.",
+		"ending": "pcsRetreated"
+	}]
+},{
+	"encounter":"koboldDemo",
+	"npcs": ["kobold",12],
+	"dialogue":
+	[{
+		"text":"Up ahead, the tunnel breaches the bottom of a dark cavern as a ravine, and gradually ramps up to level with the cavern floor. Ledges to either side overlook the ravine for some distance, and what you can see of the cavern above is cluttered with stones and boulders.",
+		"options":
+			["advance","climb","fly","leave"]
+	},{
+		"node":"advance",
+		"trans":"Advance through the ravine.",
+		"text":"As you tramp forward, a great pile of stones and boulders is upturned and crashes into the ravine amidst your party, causing a number of scrapes and bruises. The rocks are closely followed by shrieking kobolds armed with knives.",
+		"ending":"startCombat"
+	},{
+		"node":"climb",
+		"trans":"Have the fighter climb the side of the ravine to scout ahead.",
+		"text":"The climb is difficult but not too far, so after a brief effort the fighter manages to clank up to a clear section of the ledge and look around. Besides some tunnels scattered at the edges of the cavern, there's nothing of interest to be found. The party reforms at the top of the ramp and moves on.",
+		"ending": "end"
+	},{
+		"node":"fly",
+		"trans":"Have the wizard cast a spell to fly up and observe the cavern from above.",
+		"text":"The wizard silently floats up like a dandelion in the wind and spots some kobolds hiding behind a large pile of rocks near the edge of the ravine. One squeals a warning, and before the wizard can act, they scatter and flee through several tunnels at the edge of the cavern. The party warily reforms at the top of the ramp, and moves on.",
+		"ending":"end"
+	},{
+		"node":"leave",
+		"trans":"Find a different way forward.",
+		"text":"Blind caverns are dangerous. You backtrack to find a safer route.",
+		"ending":"pcsRetreated"
+	},{
+		"node":"wonCombat",
+		"text":"The kobolds tricked you, but they aren't very tough, so you beat them anyway.",
+		"ending":"end"
+	}]
+},{
+	"encounter":"undeadEncounter",
+	"npcs":["skeleton",8],
+	"dialogue":
+	[{
+		"text":"You spot an open door off the corridor ahead, and you can see skeletons milling around inside the room. They haven't noticed you yet, but if you linger it's only a matter of time.",
+		"options":
+			["attack","sneak","turn","leave"]
+	},{
+		"node":"attack",
+		"trans":"Attack the skeletons.",
+		"text":"You advance up the hallways, and the skeletons predictably rush out to meet you.",
+		"ending": "startCombat"
+	},{
+		"node":"sneak",
+		"trans":"Have your thief close the door.",
+		"text":"Your thief sidles up to the door and shuts it, and the party marches past the oblivious skeletons.",
+		"ending": "end"
+	},{
+		"node":"turn",
+		"trans":"Have your cleric turn the skeletons.",
+		"text":"Your cleric advances, and the skeletons charge. The cleric recites from a great tome of scripture, and the skeletons fall asleep, which looks a lot like falling apart in their case. You move on.",
+		"ending": "end"
+	},{
+		"node":"leave",
+		"trans":"Leave.",
+		"text":"Skeletons are sort of dangerous, so you back up and look for another path.",
+		"ending": "pcsRetreated"
+	},{
+		"node":"wonCombat",
+		"text":"Skeletons aren't very tough, even though they can sometimes hit hard. You pile them up and move on.",
+		"ending": "end"
+	}]
+},{
+	"encounter":"debugEncounter",
+	"dialogue":
+	[{
+		"text":"You enter a dialogue where holding the '1' key loops indefinitely.",
+		"options":
+			["loop1","leave"]
+	},{
+		"node":"loop1",
+		"trans":"Looping node number 1",
+		"text": "You loop into an ODD node.",
+		"options":
+			["loop2","leave"]
+	},{
+		"node":"loop2",
+		"trans":"Loop node #2",
+		"text": "You loop into an EVEN node.",
+		"options":
+			["loop1","leave"]
+	},{
+		"node":"leave",
+		"trans":"Leave",
+		"text": "You leave the loop.",
+		"ending":"end"
+	}]
+}]
